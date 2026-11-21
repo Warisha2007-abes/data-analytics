@@ -1,0 +1,292 @@
+import numpy as np
+import pandas as pd
+import os
+
+# --------------------------------
+# CREATE DATASET
+# --------------------------------
+
+if not os.path.exists("books.csv"):
+
+    books = [
+        [101, "Atomic Habits", "James Clear", "Self Help", 12, 5, "Completed"],
+        [102, "Harry Potter", "J K Rowling", "Fantasy", 20, 4, "Completed"],
+        [103, "Rich Dad Poor Dad", "Robert Kiyosaki", "Finance", 10, 5, "Completed"],
+        [104, "The Alchemist", "Paulo Coelho", "Fiction", 8, 4, "Completed"],
+        [105, "Wings of Fire", "APJ Abdul Kalam", "Biography", 15, 5, "Completed"],
+    ]
+
+    # Create 50 records
+    for i in range(6, 51):
+        books.append([
+            100 + i,
+            "Book " + str(i),
+            "Author " + str(i),
+            "Fiction",
+            10 + i % 10,
+            3 + i % 3,
+            "Completed"
+        ])
+
+    data = pd.DataFrame(books, columns=[
+        "Book_ID", "Book_Name", "Author", "Genre",
+        "Reading_Days", "Rating", "Status"
+    ])
+
+    data.to_csv("books.csv", index=False)
+
+
+# --------------------------------
+# DISPLAY ALL BOOKS
+# --------------------------------
+
+def display_books():
+
+    data = pd.read_csv("books.csv")
+
+    print(data)
+
+
+# --------------------------------
+# ADD NEW BOOK
+# --------------------------------
+
+def add_book():
+
+    data = pd.read_csv("books.csv")
+
+    book_id = int(input("Enter Book ID: "))
+    name = input("Enter Book Name: ")
+    author = input("Enter Author: ")
+    genre = input("Enter Genre: ")
+    days = int(input("Enter Reading Days: "))
+    rating = int(input("Enter Rating (1-5): "))
+    status = input("Enter Status: ")
+
+    new_book = {
+        "Book_ID": book_id,
+        "Book_Name": name,
+        "Author": author,
+        "Genre": genre,
+        "Reading_Days": days,
+        "Rating": rating,
+        "Status": status
+    }
+
+    data.loc[len(data)] = new_book
+
+    data.to_csv("books.csv", index=False)
+
+    print("Book Added Successfully")
+
+
+# --------------------------------
+# SEARCH BOOK
+# --------------------------------
+
+def search_book():
+
+    data = pd.read_csv("books.csv")
+
+    book_id = int(input("Enter Book ID to Search: "))
+
+    result = data[data["Book_ID"] == book_id]
+
+    if len(result) > 0:
+        print(result)
+    else:
+        print("Book Not Found")
+
+
+# --------------------------------
+# UPDATE BOOK
+# --------------------------------
+
+def update_book():
+
+    data = pd.read_csv("books.csv")
+
+    book_id = int(input("Enter Book ID to Update: "))
+
+    if book_id in data["Book_ID"].values:
+
+        new_rating = int(input("Enter New Rating: "))
+
+        data.loc[data["Book_ID"] == book_id, "Rating"] = new_rating
+
+        data.to_csv("books.csv", index=False)
+
+        print("Book Updated Successfully")
+
+    else:
+        print("Book Not Found")
+
+
+# --------------------------------
+# DELETE BOOK
+# --------------------------------
+
+def delete_book():
+
+    data = pd.read_csv("books.csv")
+
+    book_id = int(input("Enter Book ID to Delete: "))
+
+    data = data[data["Book_ID"] != book_id]
+
+    data.to_csv("books.csv", index=False)
+
+    print("Book Deleted Successfully")
+
+
+# --------------------------------
+# NUMPY ANALYSIS
+# --------------------------------
+
+def numpy_analysis():
+
+    data = pd.read_csv("books.csv")
+
+    days = np.array(data["Reading_Days"])
+
+    print("\n1D Array:")
+    print(days)
+
+    matrix = np.array([
+        data["Reading_Days"],
+        data["Rating"]
+    ])
+
+    print("\n2D Array:")
+    print(matrix)
+
+    print("\nFirst Five Values:")
+    print(days[:5])
+
+    print("\nFirst Value:")
+    print(days[0])
+
+    print("\nTotal Reading Days:", np.sum(days))
+
+    print("Average Reading Days:", np.mean(days))
+
+    print("Maximum Reading Days:", np.max(days))
+
+    print("Minimum Reading Days:", np.min(days))
+
+    print("Standard Deviation:", np.std(days))
+
+
+# --------------------------------
+# PANDAS ANALYSIS
+# --------------------------------
+
+def pandas_analysis():
+
+    data = pd.read_csv("books.csv")
+
+    print("\nFirst Five Books:")
+    print(data.head())
+
+    print("\nSelected Columns:")
+    print(data[["Book_Name", "Genre", "Rating"]])
+
+    print("\nBooks With Rating 5:")
+    print(data[data["Rating"] == 5])
+
+    print("\nBooks Sorted By Rating:")
+    print(data.sort_values(by="Rating", ascending=False))
+
+    print("\nGenre Wise Book Count:")
+    print(data.groupby("Genre")["Book_ID"].count())
+
+    print("\nMissing Values:")
+    print(data.isnull().sum())
+
+    data["Rating"] = data["Rating"].fillna(0)
+
+    print("\nStatistical Analysis:")
+    print(data.describe())
+
+
+# --------------------------------
+# SUMMARY REPORT
+# --------------------------------
+
+def summary_report():
+
+    data = pd.read_csv("books.csv")
+
+    print("\n===== LIBRARY SUMMARY REPORT =====")
+
+    print("Total Books:", len(data))
+
+    print("Completed Books:",
+          len(data[data["Status"] == "Completed"]))
+
+    print("Currently Reading:",
+          len(data[data["Status"] == "Reading"]))
+
+    print("Average Rating:", data["Rating"].mean())
+
+    print("Average Reading Days:",
+          data["Reading_Days"].mean())
+
+    print("\nMost Popular Genre:")
+
+    print(data["Genre"].value_counts().idxmax())
+
+
+# --------------------------------
+# MAIN MENU
+# --------------------------------
+
+while True:
+
+    print("\n===== LIBRARY MANAGEMENT SYSTEM =====")
+
+    print("1. Add New Book")
+    print("2. Display All Books")
+    print("3. Search Book")
+    print("4. Update Book")
+    print("5. Delete Book")
+    print("6. NumPy Analysis")
+    print("7. Pandas Analysis")
+    print("8. Summary Report")
+    print("9. Exit")
+
+    choice = input("Enter Your Choice: ")
+
+    if choice == "1":
+        add_book()
+
+    elif choice == "2":
+        display_books()
+
+    elif choice == "3":
+        search_book()
+
+    elif choice == "4":
+        update_book()
+
+    elif choice == "5":
+        delete_book()
+
+    elif choice == "6":
+        numpy_analysis()
+
+    elif choice == "7":
+        pandas_analysis()
+
+    elif choice == "8":
+        summary_report()
+
+    elif choice == "9":
+        print("Thank You!")
+        break
+
+    else:
+        print("Invalid Choice")
+        
+# Warisha 
+#adm no=2026b01010494
